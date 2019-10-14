@@ -1,0 +1,285 @@
+<canvas id="tela" width="800" height="400"></canvas>
+
+<script>
+
+//variaveis de actors
+var tela;
+var c;
+
+var bola;
+var raquete1;
+var raquete2;
+
+var tela_x = 800;
+var tela_y = 400;
+
+var raquete1_x = 5;
+var raquete1_y = tela_y/2;
+
+var raquete2_x = tela_x - 20;
+var raquete2_y = tela_y/2;
+
+var bola_x = tela_x/2;
+var bola_y = tela_y/2;
+
+
+//direção inicial da bola
+var setdirecao = Math.floor(Math.random() * 4);
+switch (setdirecao){
+case 0:
+	paraEsquerda = true;
+	paraDireita = false;
+	paraCima = true;
+	paraBaixo = false;
+	break;
+case 1:
+	paraEsquerda = true;
+	paraDireita = false;
+	paraCima = false;
+	paraBaixo = true;
+	break;
+case 2:
+	paraEsquerda = false;
+	paraDireita = true;
+	paraCima = true;
+	paraBaixo = false;
+	break;
+case 3:
+	paraEsquerda = false;
+	paraDireita = true;
+	paraCima = false;
+	paraBaixo = true;
+	break;
+}
+
+var on_game = true;
+
+const tamanho_ponto = 1;
+
+var x = [];
+var y = [];
+
+var atraso = 1;
+
+//var batida;
+
+var set_ball_speed_x = 1;
+var set_ball_speed_y = 1;
+
+var pont_raquete1 = 0;
+var pont_raquete2 = 0;
+
+start_game();
+
+function start_game(){
+
+	//batida = new Audio("batida_pong.mp3")
+	tela = document.getElementById("tela");
+    c = tela.getContext("2d");
+
+	c.fillStyle = "Black";
+	c.fillRect(0, 0, tela_x, tela_y);
+
+	carregar_imagens();
+	desenhar_imagens();
+
+    setTimeout("ciclo_de_jogo()", atraso);
+	
+
+}
+
+function carregar_imagens(){
+
+	bola = new Image();
+	bola.src = "bola.png";
+	
+	raquete1 = new Image();
+	raquete1.src = "raquete1.png";
+
+	raquete2 = new Image();
+	raquete2.src = "raquete2.png";
+
+}
+
+function ciclo_de_jogo(){
+	desenhar_imagens();
+	if(on_game){
+		verificar_bola();
+		mover_bola();
+		checar_raquetes();
+		setTimeout("ciclo_de_jogo()", atraso);
+	}
+}
+
+function mover_bola(){
+    if (paraEsquerda && paraBaixo) {
+        bola_x -= set_ball_speed_x;
+		bola_y += set_ball_speed_y;
+    }
+
+    if (paraDireita && paraBaixo) {
+        bola_x += set_ball_speed_x;
+		bola_y += set_ball_speed_y;
+    }
+
+    if (paraEsquerda && paraCima) {
+        bola_y -= set_ball_speed_x;
+		bola_x -= set_ball_speed_y;
+    }
+
+    if (paraDireita && paraCima) {
+        bola_y -= set_ball_speed_x;
+		bola_x += set_ball_speed_y;
+    }
+}
+
+// função que checa a colisão da bola com os demais objetos da tela.
+function verificar_bola() {
+
+   	if (bola_y + 15 >= tela_y) {
+   		//batida.play();
+        //batida.currentTime = 0;
+		paraCima = true;
+		paraBaixo = false;
+	} else if( bola_y <= 0) {
+		//batida.play();
+        //batida.currentTime = 0;
+		paraCima = false;
+		paraBaixo = true;
+	}
+
+	for(m = -14; m <= 59; m++) {
+
+		if (bola_x == raquete1_x + 15 && bola_y == raquete1_y + m) {
+			//batida.play();
+        	//batida.currentTime = 0;
+
+			if(bola_y  > raquete1_y - 14 && bola_y < raquete1_y + 14){
+				paraDireita = true;
+				paraCima =  true;
+				paraEsquerda = false;
+				paraBaixo = false;
+				set_ball_speed_y = 1;
+				set_ball_speed_x = 1;
+
+			} else if(bola_y  >= raquete1_y + 15 && bola_y < raquete1_y + 30){
+				set_ball_speed_x = 2;
+				set_ball_speed_y = 2;
+				paraEsquerda = false;
+				paraDireita = true;
+
+			} else if(bola_y  >= raquete1_y + 30 && bola_y < raquete1_y + 59){
+				paraDireita = true;
+				paraCima =  false;
+				paraEsquerda = false;
+				paraBaixo = true;
+				set_ball_speed_y = 1;
+				set_ball_speed_x = 1;
+
+			}
+
+		} else if(bola_x + 15 == tela_x - 15 && bola_y == raquete2_y + m) {
+			//batida.play();
+        	//batida.currentTime = 0;
+			if(bola_y  > raquete2_y - 14 && bola_y < raquete2_y + 14){
+				paraDireita = false;
+				paraCima =  true;
+				paraEsquerda = true;
+				paraBaixo = false;
+				set_ball_speed_y = 1;
+				set_ball_speed_x = 1;
+
+			} else if(bola_y  >= raquete2_y + 15 && bola_y < raquete2_y + 30){
+				set_ball_speed_x = 2;
+				set_ball_speed_y = 2;
+				paraEsquerda = true;
+				paraDireita = false;
+			} else if(bola_y  >= raquete2_y + 30 && bola_y < raquete2_y + 59){
+				paraDireita = false;
+				paraCima =  false;
+				paraEsquerda = true;
+				paraBaixo = true;
+				set_ball_speed_y = 1;
+				set_ball_speed_x = 1;
+			}
+		}
+	}
+
+	if (bola_x > tela_x) {
+		bola_x = tela_x/2;
+		bola_y = tela_y/2;
+		pont_raquete1++;
+	} else if (bola_x < 0){
+		bola_x = tela_x/2;
+		bola_y = tela_y/2;
+		pont_raquete2++;
+	}
+	if (pont_raquete1 > 5 || pont_raquete2 > 5) {
+		on_game = false;
+	}
+}
+
+function desenhar_imagens(){
+
+	c.clearRect(0, 0, tela_x, tela_y);
+	c.fillRect(0, 0, tela_x, tela_y);
+
+	if (on_game) {
+        c.drawImage(bola, bola_x, bola_y);
+
+		c.drawImage(raquete1, raquete1_x, raquete1_y);
+		c.drawImage(raquete2, raquete2_x, raquete2_y);
+   
+    } else {
+		end_game();
+    }        
+
+}
+
+function end_game(){
+	c.fillStyle = "RED";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "bold 20px Stylus BT, sans-serif";
+	if (pont_raquete1 > 5) {
+    	c.fillText("JOGADOR AZUL VENCEU!", tela_x/2, tela_y/2);
+	} else if (pont_raquete2 > 5) {
+		c.fillText("JOGADOR VERMELHO VENCEU!", tela_x/2, tela_y/2);
+	}
+}
+//função para não deixar que as raquetes saiam da tela.
+function checar_raquetes(){
+	if (raquete1_y < 0) {
+		raquete1_y = 0;
+	} else if (raquete1_y + 45 > tela_y) {
+		raquete1_y = tela_y -  45;
+	}
+	if (raquete2_y < 0) {
+		raquete2_y = 0;
+	} else if (raquete2_y + 45 > tela_y) {
+		raquete2_y = tela_y - 45;
+	}
+}
+
+// função de teclas.
+onkeydown = function(e) {
+    var tecla = e.keyCode;
+
+    if (tecla == 83) {
+    	raquete1_y += tamanho_ponto + 9;
+    }
+
+    if (tecla == 87) {
+    	raquete1_y -= tamanho_ponto + 9;
+    }
+
+    if (tecla == 40) {
+    	raquete2_y += tamanho_ponto + 9;
+    }
+
+    if (tecla == 38) {
+    	raquete2_y -= tamanho_ponto + 9;
+    }        
+}
+
+</script>
